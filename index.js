@@ -30,6 +30,7 @@ const embed = (threads, pattern) => {
     });
 };
 
+let watcher;
 client.on('message', async (message) => {
     if (message.author.bot) return;
     const { content, channel } = message;
@@ -46,6 +47,7 @@ client.on('message', async (message) => {
     let rawchannel, pattern;
     switch (command.substr(prefix.length)) {
         case 'watch':
+            if (!(channel.id == '672254609615486996' || channel.id == "672263292781068288")) return;
             if(message.author.id != "357219721885777921") 
                 break;
             [rawchannel, pattern] = args;
@@ -55,14 +57,17 @@ client.on('message', async (message) => {
                 const target = message.guild.channels.get(channelid);
                 if (!target)
                     await channel.send('that channel is not in this guild');
-                else new ThreadWatcher(target, pattern);
+                else {
+                    if(watcher) watcher.kill();
+                    watcher = new ThreadWatcher(target, pattern);
+                }
             } else await channel.send('expected channel for first argument');
             break;
         case 'find':
             [pattern] = args;
             const threads = await find(new RegExp(pattern))
             const reply = await channel.send(embed(threads, pattern));
-            //await reply.delete(5000);
+            await reply.delete(5000);
             break;
         case 'args':
             await channel.send(args.join("\n====\n"));

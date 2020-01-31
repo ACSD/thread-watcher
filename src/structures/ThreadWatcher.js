@@ -71,6 +71,10 @@ class ThreadWatcher {
         this.messages.delete(key);
         this.threads.delete(key);
     }
+
+    kill() {
+        clearInterval(this.interval);
+    }
 }
 
 module.exports = ThreadWatcher;
