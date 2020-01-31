@@ -48,7 +48,7 @@ class ThreadWatcher {
                 await messages
                     .get(thread.no)
                     .edit(new ThreadEmbed(thread, active));
-                if (active) {
+                if (!active) {
                     console.log(`deactivating: ${thread.no}`);
                     this.delete(thread.no);
                 }
