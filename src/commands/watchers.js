@@ -17,8 +17,7 @@ module.exports = new Command(
             FLAGS.MANAGE_MESSAGES
         ]),
         permissions: new Permissions([
-            FLAGS.EMBED_LINKS,
-            FLAGS.MANAGE_MESSAGES
+            FLAGS.ADMINISTRATOR,
         ]),
         overrides: ['671978823310639104'],
         channels: {
@@ -81,6 +80,7 @@ module.exports = new Command(
                 if(cwatchers.has(source)) {
                     cwatchers.get(source).kill();
                     await message.channel.send('OK');
+                    break;
                 }
                 await message.channel.send(`not watching for ${source}`);
                 break;
