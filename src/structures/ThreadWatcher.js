@@ -1,7 +1,7 @@
 //const { Collection } = require('discord.js');
 const assert = require('assert');
-const find = require('../util/find');
-const threads = require('../util/threads');
+const catalog = require('../4chan/catalog');
+const threads = require('../4chan/threads');
 const ThreadEmbed = require('./ThreadEmbed');
 
 class ThreadWatcher {
@@ -20,31 +20,30 @@ class ThreadWatcher {
         this.lastno = 0;
     }
     async update() {
-        console.log('update');
+        //console.log('update');
         let messages = this.messages;
         messages.forEach((value, key) => {
             if (value.deleted) this.delete(key);
         });
-        let results = await find(this.regex);
-        let actives = await threads();
+        let results = await catalog.find(this.regex);
 
-        let updates = await results
+        await results
             .filter((thread) => this.threads.has(thread.no))
             .filter((thread) => {
                 const { no, replies } = thread;
                 if (replies != this.threads.get(no).replies) {
-                    console.log(
+                    /*console.log(
                         `${no}\nreplies:\n    ${
                             this.threads.get(no).replies
                         } > ${replies}`
-                    );
+                    );*/
                     this.threads.set(no, thread);
                     return true;
                 }
-                return !actives.has(thread.no);
+                return !threads.has(thread.no);
             })
             .forEach(async (thread) => {
-                const active = actives.has(thread.no);
+                const active = threads.has(thread.no);
                 await messages
                     .get(thread.no)
                     .edit(new ThreadEmbed(thread, active));
