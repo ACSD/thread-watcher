@@ -79,6 +79,7 @@ module.exports = new Command(
             case 'remove':
                 if(cwatchers.has(source)) {
                     cwatchers.get(source).kill();
+                    cwatchers.delete(source);
                     await message.channel.send('OK');
                     break;
                 }
