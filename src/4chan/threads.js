@@ -6,19 +6,10 @@ async function pages() {
     );
 }
 
-async function threads() {
+module.exports = async function stats() {
     return (await pages())
         .map((page) => page.threads)
         .reduce((p, c) => [...p, ...c]);
-}
-
-async function has(no) {
-    for (const thread of await threads()) {
-        if (thread.no == no) return true;
-    }
-    return false;
-}
+};
 
 module.exports.pages = pages;
-module.exports.threads = threads;
-module.exports.has = has;

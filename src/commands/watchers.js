@@ -8,11 +8,23 @@ const watchers = new Map();
 
 module.exports = new Command(
     {
-        name: 'watcher',
+        name: 'watchers',
         description: '',
         usage: 'watch [add|list] channel pattern',
-        permissions: new Permissions([FLAGS.MANAGE_MESSAGES]),
-        overrides: []
+        requires: new Permissions([
+            FLAGS.SEND_MESSAGES,
+            FLAGS.EMBED_LINKS,
+            FLAGS.MANAGE_MESSAGES
+        ]),
+        permissions: new Permissions([
+            FLAGS.EMBED_LINKS,
+            FLAGS.MANAGE_MESSAGES
+        ]),
+        overrides: ["671978823310639104"],
+        channels: {
+            mode: "whitelist",
+            list: [ "672263292781068288", "672254609615486996" ]
+        }
     },
     async (message, op, channel, pattern) => {
         if (!(channel instanceof TextChannel))
@@ -54,7 +66,9 @@ module.exports = new Command(
                         fields: keys.map((key) => ({
                             inline: false,
                             name: `${keys}`,
-                            value: `watching ${cwatchers.get(key).threads.length} threads`
+                            value: `watching ${
+                                cwatchers.get(key).threads.length
+                            } threads`
                         }))
                     })
                 );

@@ -11,7 +11,11 @@ module.exports = new Command(
         usage: 'find pattern',
         requires: new Permissions([FLAGS.SEND_MESSAGES, FLAGS.EMBED_LINKS]),
         permissions: new Permissions([FLAGS.EMBED_LINKS]),
-        overrides: ['672933798224068658']
+        overrides: ['672933798224068658'],
+        channels: {
+            mode: "whitelist",
+            list: [ "672263292781068288", "672254609615486996" ]
+        }
     },
     async ({ channel }, pattern = '', page = '1') => {
         if (!pattern instanceof RegExp && 'string' != typeof pattern)

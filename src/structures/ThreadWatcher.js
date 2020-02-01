@@ -5,6 +5,7 @@ const threads = require('../4chan/threads');
 const ThreadEmbed = require('./ThreadEmbed');
 
 class ThreadWatcher {
+    
     constructor(channel, regex = '', frequency = process.env.BOT_FREQUENCY) {
         assert(
             regex != null &&
@@ -19,39 +20,39 @@ class ThreadWatcher {
         this.interval = setInterval(this.update.bind(this), frequency);
         this.lastno = 0;
     }
+
     async update() {
         //console.log('update');
         let messages = this.messages;
         messages.forEach((value, key) => {
             if (value.deleted) this.delete(key);
         });
+        let actives = await threads();
         let results = await catalog.find(this.regex);
 
-        await results
+        let updates = results
             .filter((thread) => this.threads.has(thread.no))
             .filter((thread) => {
                 const { no, replies } = thread;
                 if (replies != this.threads.get(no).replies) {
-                    /*console.log(
-                        `${no}\nreplies:\n    ${
-                            this.threads.get(no).replies
-                        } > ${replies}`
-                    );*/
+                    console.log(
+                        `${no}:\t${this.threads.get(no).replies} > ${replies}`
+                    );
                     this.threads.set(no, thread);
                     return true;
                 }
-                return !threads.has(thread.no);
-            })
-            .forEach(async (thread) => {
-                const active = threads.has(thread.no);
-                await messages
-                    .get(thread.no)
-                    .edit(new ThreadEmbed(thread, active));
-                if (!active) {
-                    console.log(`deactivating: ${thread.no}`);
-                    this.delete(thread.no);
-                }
+                return actives.find((t) => t.no == thread.no) == null;
             });
+
+        await updates.forEach(async (thread) => {
+            const active = actives.find((t) => t.no == thread.no) != null;
+
+            await messages.get(thread.no).edit(new ThreadEmbed(thread, active));
+            if (!active) {
+                console.log(`${thread.no}:\tdeactivating`);
+                this.delete(thread.no);
+            }
+        });
 
         results
             .filter((t) => t.no > this.lastno && !this.threads.has(t.no))

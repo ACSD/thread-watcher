@@ -19,7 +19,7 @@ client.on('ready', () => {
 
 
 client.on('message', async (message) => {
-    const { author, content, channel } = message;
+    const { author, content } = message;
     if (author.bot || !content.startsWith(prefix)) return;
     let [command, ...args] = [
         ...content.substr(prefix.length).matchAll(args_pattern)

@@ -1,6 +1,5 @@
 const fetch = require('isomorphic-unfetch');
 
-
 async function pages() {
     return await fetch('https://a.4cdn.org/pol/catalog.json').then((r) =>
         r.json()
@@ -15,6 +14,8 @@ async function find(pattern) {
     pattern = pattern instanceof RegExp ? pattern : new RegExp(pattern);
     return (await threads()).filter(thread=>pattern.test(thread.sub));
 };
+
+//(async ()=>console.log(await threads()))();
 
 module.exports.pages = pages;
 module.exports.threads = threads;
