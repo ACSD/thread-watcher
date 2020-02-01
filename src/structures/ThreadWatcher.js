@@ -5,12 +5,10 @@ const threads = require('../4chan/threads');
 const ThreadEmbed = require('./ThreadEmbed');
 
 class ThreadWatcher {
-    
+
     constructor(channel, regex = '', frequency = process.env.BOT_FREQUENCY) {
-        assert(
-            regex != null &&
-                (regex instanceof RegExp ||
-                    ('string' == typeof regex && regex.length > 0)),
+        assert( regex != null && 
+                (regex instanceof RegExp || ('string' == typeof regex && regex.length > 0)),
             'first argument expected a regexp or a rexexp string with length greter than 0'
         );
         this.channel = channel;
@@ -35,9 +33,7 @@ class ThreadWatcher {
             .filter((thread) => {
                 const { no, replies } = thread;
                 if (replies != this.threads.get(no).replies) {
-                    console.log(
-                        `${no}:\t${this.threads.get(no).replies} > ${replies}`
-                    );
+                    //console.log(`${no}:\t${this.threads.get(no).replies} > ${replies}`);
                     this.threads.set(no, thread);
                     return true;
                 }
@@ -46,7 +42,6 @@ class ThreadWatcher {
 
         await updates.forEach(async (thread) => {
             const active = actives.find((t) => t.no == thread.no) != null;
-
             await messages.get(thread.no).edit(new ThreadEmbed(thread, active));
             if (!active) {
                 console.log(`${thread.no}:\tdeactivating`);

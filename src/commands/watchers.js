@@ -20,10 +20,10 @@ module.exports = new Command(
             FLAGS.EMBED_LINKS,
             FLAGS.MANAGE_MESSAGES
         ]),
-        overrides: ["671978823310639104"],
+        overrides: ['671978823310639104'],
         channels: {
-            mode: "whitelist",
-            list: [ "672263292781068288", "672254609615486996" ]
+            mode: 'whitelist',
+            list: ['672263292781068288', '672254609615486996']
         }
     },
     async (message, op, channel, pattern) => {
@@ -52,31 +52,40 @@ module.exports = new Command(
                         `already watching for ${source} in <#${channel.id}>`
                     );
                 cwatchers.set(source, new ThreadWatcher(channel, pattern));
+                await message.channel.send(
+                    `started watching for ${source} in <#${channel.id}>`
+                );
                 break;
             case 'list':
                 if (cwatchers.size == 0)
                     return await message.channel.send(
-                        `no threads are being watched in ${channel.id}`
+                        `no threads are being watched in <#${channel.id}>`
                     );
+                
+                //TODO clean up hackfix for overflow on fields
+                let keys = [...cwatchers.keys()].slice(0, 24);
 
-                let keys = [...cwatchers.keys()];
-
-                await channel.send(
+                await message.channel.send(
                     new RichEmbed({
                         fields: keys.map((key) => ({
                             inline: false,
                             name: `${keys}`,
                             value: `watching ${
-                                cwatchers.get(key).threads.length
+                                cwatchers.get(key).threads.size
                             } threads`
                         }))
                     })
                 );
                 break;
             case 'remove':
+                if(cwatchers.has(source)) {
+                    cwatchers.get(source).kill();
+                    await message.channel.send('OK');
+                }
+                await message.channel.send(`not watching for ${source}`);
                 break;
             default:
-                return await message.channel.send(`${op} is not a valid op`);
+                await message.channel.send(`${op} is not a valid op`);
                 break;
         }
     }

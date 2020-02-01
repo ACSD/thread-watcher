@@ -46,14 +46,12 @@ class Command {
 
             if (CHANNELS_PATTERN.test(value)) {
                 const channelid = value.match(CHANNELS_PATTERN)[1];
-                console.log(channelid);
                 if (this.client.channels.has(channelid))
                     return this.client.channels.get(channelid);
             }
 
             if (USERS_PATTERN.test(value)) {
                 const userid = value.match(USERS_PATTERN)[1];
-                console.log(userid);
                 if (this.client.users.has(userid))
                     return this.client.users.get(userid);
             }
