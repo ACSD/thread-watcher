@@ -33,7 +33,7 @@ class ThreadWatcher {
             .filter((thread) => {
                 const { no, replies } = thread;
                 if (replies != this.threads.get(no).replies) {
-                    //console.log(`${no}:\t${this.threads.get(no).replies} > ${replies}`);
+                    console.log(`${no}:\t${this.threads.get(no).replies} > ${replies}`);
                     this.threads.set(no, thread);
                     return true;
                 }

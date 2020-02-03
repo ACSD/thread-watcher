@@ -1,6 +1,6 @@
 const { Permissions, TextChannel, RichEmbed } = require('discord.js');
 const Command = require('../structures/Command');
-const ThreadWatcher = require('../structures/ThreadWatcher');
+const Watcher = require('../structures/Watcher');
 
 const FLAGS = Permissions.FLAGS;
 
@@ -10,7 +10,7 @@ module.exports = new Command(
     {
         name: 'watchers',
         description: '',
-        usage: 'watch [add|list] channel pattern',
+        usage: 'watch [add|list] channel pattern ...boards',
         requires: new Permissions([
             FLAGS.SEND_MESSAGES,
             FLAGS.EMBED_LINKS,
@@ -25,7 +25,7 @@ module.exports = new Command(
             list: ['672263292781068288', '672254609615486996']
         }
     },
-    async (message, op, channel, pattern) => {
+    async (message, op, channel, pattern, ...boardlist) => {
         if (!(channel instanceof TextChannel))
             return await message.channel.send(
                 'expected a channel for second argument'
@@ -34,23 +34,23 @@ module.exports = new Command(
             return await message.channel.send(
                 'that channel is not in this guild'
             );
-        if (!pattern instanceof RegExp || !pattern instanceof String)
+        if (!pattern instanceof RegExp || ("string" !== typeof pattern))
             return await message.channel.send(
                 'expected string or regexp for pattern'
             );
-
+        pattern = pattern instanceof RegExp ? pattern.source : new RegExp(pattern);
         if (!watchers.has(channel.id)) watchers.set(channel.id, new Map());
 
         const cwatchers = watchers.get(channel.id);
 
-        const source = pattern instanceof RegExp ? pattern.source : pattern;
+        const source = pattern.source;
         switch (op) {
             case 'add':
                 if (cwatchers.has(source))
                     return await message.channel.send(
                         `already watching for ${source} in <#${channel.id}>`
                     );
-                cwatchers.set(source, new ThreadWatcher(channel, pattern));
+                cwatchers.set(source, new Watcher(channel, pattern, [...boardlist]));
                 await message.channel.send(
                     `started watching for ${source} in <#${channel.id}>`
                 );
@@ -68,9 +68,9 @@ module.exports = new Command(
                     new RichEmbed({
                         fields: keys.map((key) => ({
                             inline: false,
-                            name: `${keys}`,
+                            name: `${key}`,
                             value: `watching ${
-                                cwatchers.get(key).threads.size
+                                cwatchers.get(key).messages.size
                             } threads`
                         }))
                     })
